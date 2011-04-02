@@ -7,6 +7,7 @@
 # Interactively setup raster transparency
 #
 # Copyright (C) 2010 Alexander Bruy (alexander.bruy@gmail.com)
+#                    NextGIS (info@nextgis.ru)
 #
 # This source is free software; you can redistribute it and/or modify it under
 # the terms of the GNU General Public License as published by the Free
