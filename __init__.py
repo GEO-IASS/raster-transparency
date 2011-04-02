@@ -41,7 +41,7 @@ def qgisMinimumVersion():
 	return "1.5"
 
 def authorName():
-	return "Alexander Bruy, NextGIS"
+	return "Alexander Bruy (NextGIS)"
 
 def icon():
 	return "icons/rastertransparency.png"
