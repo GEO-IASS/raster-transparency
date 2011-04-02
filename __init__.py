@@ -9,6 +9,7 @@ mVersion = "0.1.0"
 # Interactively setup raster transparency
 #
 # Copyright (C) 2010 Alexander Bruy (alexander.bruy@gmail.com)
+#                    NextGIS (info@nextgis.ru)
 #
 # This source is free software; you can redistribute it and/or modify it under
 # the terms of the GNU General Public License as published by the Free
@@ -31,7 +32,7 @@ def name():
 	return "Raster Transparency"
 
 def description():
-	return "Change raster transparency interacively"
+	return "Change raster transparency interactively"
 
 def version():
 	return mVersion
@@ -40,7 +41,7 @@ def qgisMinimumVersion():
 	return "1.5"
 
 def authorName():
-	return "Alexander Bruy"
+	return "Alexander Bruy (NextGIS)"
 
 def icon():
 	return "icons/rastertransparency.png"
