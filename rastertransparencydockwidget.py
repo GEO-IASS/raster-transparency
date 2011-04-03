@@ -41,28 +41,92 @@ class RasterTransparencyDockWidget( QDockWidget, Ui_RasterTransparencyDockWidget
     self.setAllowedAreas( Qt.LeftDockWidgetArea | Qt.RightDockWidgetArea )
 
     self.plugin = plugin
-    self.layerRegistry = QgsMapLayerRegistry.instance()
 
     # connect signals and slots
-    QObject.connect( self.slider, SIGNAL( "valueChanged( int )" ), self.__updateSpin )
-    QObject.connect( self.spinBox, SIGNAL( "valueChanged( int )" ), self.__updateSlider )
-    QObject.connect( self.slider, SIGNAL( "sliderReleased ()" ), self.updateRasterTransparency )
+    QObject.connect( self.sliderStart, SIGNAL( "valueChanged( int )" ), self.__updateSpinStart )
+    QObject.connect( self.spinStart, SIGNAL( "valueChanged( int )" ), self.__updateSliderStart )
+    QObject.connect( self.sliderEnd, SIGNAL( "valueChanged( int )" ), self.__updateSpinEnd )
+    QObject.connect( self.spinEnd, SIGNAL( "valueChanged( int )" ), self.__updateSliderEnd )
+    QObject.connect( self.sliderStart, SIGNAL( "sliderReleased ()" ), self.updateRasterTransparency )
+    QObject.connect( self.sliderEnd, SIGNAL( "sliderReleased ()" ), self.updateRasterTransparency )
 
   def updateRasterTransparency( self ):
     transparencyList = []
-    for v in range( 0, self.slider.value() + 1 ):
-      tr = QgsRasterTransparency.TransparentSingleValuePixel()
-      tr.pixelValue = v
-      tr.percentTransparent = 100
-      transparencyList.append( tr )
+
+    if self.sliderStart.value() != 0:
+      transparencyList.extend( self.generateTransparencyList( 0, self.sliderStart.value() ) )
+
+    if self.sliderEnd.value() != self.max:
+      transparencyList.extend( self.generateTransparencyList( self.sliderEnd.value(), self.max ) )
+
     # update layer transparency
     layer = self.plugin.iface.mapCanvas().currentLayer()
+    layer.setCacheImage( None )
     layer.rasterTransparency().setTransparentSingleValuePixelList( transparencyList )
     self.plugin.iface.mapCanvas().refresh()
 
-  def __updateSpin( self, value ):
-    self.spinBox.setValue( value )
+  def __updateSpinStart( self, value ):
+    endValue = self.sliderEnd.value()
+    if value >= endValue:
+      self.spinStart.setValue( endValue -1 )
+      self.sliderStart.setValue( endValue - 1 )
+      return
+    self.spinStart.setValue( value )
 
-  def __updateSlider( self, value ):
-    self.slider.setValue( value )
+  def __updateSliderStart( self, value ):
+    endValue = self.spinEnd.value()
+    if value >= endValue:
+      self.spinStart.setValue( endValue -1 )
+      self.sliderStart.setValue( endValue - 1 )
+      return
+    self.sliderStart.setValue( value )
 
+  def __updateSpinEnd( self, value ):
+    startValue = self.sliderStart.value()
+    if value <= startValue:
+      self.spinEnd.setValue( startValue + 1 )
+      self.sliderEnd.setValue( startValue + 1 )
+      return
+    self.spinEnd.setValue( value )
+
+  def __updateSliderEnd( self, value ):
+    startValue = self.sliderStart.value()
+    if value <= startValue:
+      self.spinEnd.setValue( startValue + 1 )
+      self.sliderEnd.setValue( startValue + 1 )
+      return
+    self.sliderEnd.setValue( value )
+
+  def disableOrEnableControls( self, disable ):
+    self.label.setEnabled( disable )
+    self.sliderStart.setEnabled( disable )
+    self.spinStart.setEnabled( disable )
+    self.label_2.setEnabled( disable )
+    self.sliderEnd.setEnabled( disable )
+    self.spinEnd.setEnabled( disable )
+
+  def updateSliders( self, maxValue ):
+    self.max = maxValue
+
+    self.spinStart.setMaximum( self.max )
+    self.spinStart.setValue( 0 )
+
+    self.spinEnd.setMaximum( self.max )
+    self.spinEnd.setValue( self.max )
+
+    self.sliderStart.setMinimum( 0 )
+    self.sliderStart.setMaximum( self.max )
+    self.sliderStart.setValue( 0 )
+
+    self.sliderEnd.setMinimum( 0 )
+    self.sliderEnd.setMaximum( self.max )
+    self.sliderEnd.setValue( self.max )
+
+  def generateTransparencyList( self, min, max ):
+    trList = []
+    for v in range( min, max + 1 ):
+      tr = QgsRasterTransparency.TransparentSingleValuePixel()
+      tr.pixelValue = v
+      tr.percentTransparent = 100
+      trList.append( tr )
+    return trList
