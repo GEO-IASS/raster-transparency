@@ -44,6 +44,7 @@ class RasterTransparencyPlugin( object ):
     self.canvas = self.iface.mapCanvas()
 
     self.outputLayer = None
+    self.toolBar = None
 
   def initGui( self ):
     self.dockWidget = None
@@ -58,7 +59,12 @@ class RasterTransparencyPlugin( object ):
     QObject.connect( self.actionDock, SIGNAL( "triggered()" ), self.showHideDockWidget )
 
     # add button to the Raster toolbar
-    self.iface.rasterToolBar().addAction( self.actionDock )
+    try:
+      self.iface.rasterToolBar().addAction( self.actionDock )
+    except AttributeError:
+      self.toolBar = self.iface.addToolBar( "Raster" )
+      self.toolBar.setObjectName( "Raster" )
+      self.toolBar.addAction( self.actionDock )
 
     # find the Raster menu
     rasterMenu = None
@@ -117,7 +123,10 @@ class RasterTransparencyPlugin( object ):
     self.dockWidget = None
 
     # remove button
-    self.iface.rasterToolBar().removeAction( self.actionDock )
+    if self.toolBar is None:
+      self.iface.rasterToolBar().removeAction( self.actionDock )
+    else:
+      del self.toolBar
 
   def showHideDockWidget( self ):
     if self.dockWidget.isVisible():
