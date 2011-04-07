@@ -52,7 +52,39 @@ class RasterTransparencyPlugin( object ):
     self.layer = None
     self.toolBar = None
 
+    try:
+      self.QgisVersion = unicode( QGis.QGIS_VERSION_INT )
+    except:
+      self.QgisVersion = unicode( QGis.qgisVersion )[ 0 ]
+
+    # For i18n support
+    userPluginPath = QFileInfo( QgsApplication.qgisUserDbFilePath() ).path() + "/python/plugins/raster_transparency"
+    systemPluginPath = QgsApplication.prefixPath() + "/python/plugins/raster_transparency"
+
+    overrideLocale = QSettings().value( "locale/overrideFlag", QVariant( False ) ).toBool()
+    if not overrideLocale:
+      localeFullName = QLocale.system().name()
+    else:
+      localeFullName = QSettings().value( "locale/userLocale", QVariant( "" ) ).toString()
+
+    if QFileInfo( userPluginPath ).exists():
+      translationPath = userPluginPath + "/i18n/rastertransparency_" + localeFullName + ".qm"
+    else:
+      translationPath = systemPluginPath + "/i18n/rastertransparency_" + localeFullName + ".qm"
+
+    self.localePath = translationPath
+    if QFileInfo( self.localePath ).exists():
+      self.translator = QTranslator()
+      self.translator.load( self.localePath )
+      QCoreApplication.installTranslator( self.translator )
+
   def initGui( self ):
+    if int( self.QgisVersion ) < 10500:
+      QMessageBox.warning( self.iface.mainWindow(), "RasterTransparency",
+                           QCoreApplication.translate( "RasterTransparency", "Quantum GIS version detected: %1.%2\n" ).arg( self.QgisVersion[ 0 ] ).arg( self.QgisVersion[ 2 ] ) +
+                           QCoreApplication.translate( "RasterTransparency", "This version of Raster Transparency requires at least QGIS version 1.5.0\nPlugin will not be enabled." ) )
+      return None
+
     self.dockWidget = None
 
     # create action for plugin dockable window (show/hide)
@@ -63,8 +95,8 @@ class RasterTransparencyPlugin( object ):
 
     # create action for display plugin about dialog
     self.actionAbout = QAction( QIcon( ":/icons/rastertransparency.png" ), "About", self.iface.mainWindow() )
-    self.actionAbout.setStatusTip( QCoreApplication.translate( "RasterTransparency", "About RasterTransparency" ) )
-    self.actionAbout.setWhatsThis( QCoreApplication.translate( "RasterTransparency", "About RasterTransparency" ) )
+    self.actionAbout.setStatusTip( QCoreApplication.translate( "RasterTransparency", "About Raster Transparency" ) )
+    self.actionAbout.setWhatsThis( QCoreApplication.translate( "RasterTransparency", "About Raster Transparency" ) )
 
     # connect actions to plugin functions
     QObject.connect( self.actionDock, SIGNAL( "triggered()" ), self.showHideDockWidget )
@@ -104,7 +136,7 @@ class RasterTransparencyPlugin( object ):
     calcText = QCoreApplication.translate( "QgisApp", "Raster calculator ..." )
     for a in self.rasterMenu.actions():
       if a.text() == calcText:
-        calcAction = self.rasterMenu.actions()[ i + 1]
+        calcAction = self.rasterMenu.actions()[ i ]
         break
       i += 1
 
