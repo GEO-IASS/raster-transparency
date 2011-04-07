@@ -38,12 +38,18 @@ from __init__ import mVersion
 
 import resources
 
+singleBandStyles = [ QgsRasterLayer.SingleBandGray, QgsRasterLayer.SingleBandPseudoColor, \
+                     QgsRasterLayer.PalettedColor, QgsRasterLayer.PalettedSingleBandGray, \
+                     QgsRasterLayer.PalettedSingleBandPseudoColor, \
+                     QgsRasterLayer.MultiBandSingleBandGray, \
+                     QgsRasterLayer.MultiBandSingleBandPseudoColor ]
+
 class RasterTransparencyPlugin( object ):
   def __init__( self, iface ):
     self.iface = iface
     self.canvas = self.iface.mapCanvas()
 
-    self.outputLayer = None
+    self.layer = None
     self.toolBar = None
 
   def initGui( self ):
@@ -145,13 +151,13 @@ class RasterTransparencyPlugin( object ):
       self.dockWidget.disableOrEnableControls( False )
       return
 
-    # also disable it for multiband layers
-    if self.layer.bandCount() > 1:
+    # also disable it for multiband layers that not in single band style
+    if self.layer.bandCount() > 1 and self.layer.drawingStyle() not in singleBandStyles:
       self.dockWidget.disableOrEnableControls( False )
       return
 
     # get maximum value from raster statistics
-    stat = self.layer.bandStatistics( 1 )
+    stat = self.layer.bandStatistics( self.layer.grayBandName() )
     maxValue = stat.maximumValue
     self.dockWidget.updateSliders( maxValue )
 
