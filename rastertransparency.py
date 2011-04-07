@@ -155,7 +155,7 @@ class RasterTransparencyPlugin( object ):
       return
 
     # disable plugin for vector layers
-    if self.layer.type() == QgsMapLayer.VectorLayer and self.layer.type() != QgsMapLayer.RasterLayer:
+    if self.layer.type() != QgsMapLayer.RasterLayer:
       self.dockWidget.disableOrEnableControls( False )
       return
 
