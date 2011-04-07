@@ -126,6 +126,8 @@ class RasterTransparencyPlugin( object ):
     QObject.connect( self.iface, SIGNAL( "currentLayerChanged( QgsMapLayer* )" ), self.layerChanged )
 
   def unload( self ):
+    QObject.disconnect( self.iface, SIGNAL( "currentLayerChanged( QgsMapLayer* )" ), self.layerChanged )
+
     # remove the plugin menu items
     self.pluginMenu.removeAction( self.actionDock )
     self.pluginMenu.removeAction( self.actionAbout )
@@ -155,7 +157,7 @@ class RasterTransparencyPlugin( object ):
       return
 
     # disable plugin for vector layers
-    if self.layer.type() == QgsMapLayer.VectorLayer and self.layer.type() != QgsMapLayer.RasterLayer:
+    if self.layer.type() != QgsMapLayer.RasterLayer:
       self.dockWidget.disableOrEnableControls( False )
       return
 
