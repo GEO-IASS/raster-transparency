@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-mVersion = "0.1.6"
+mVersion = "0.1.7"
 
 #******************************************************************************
 #
@@ -33,6 +33,9 @@ def name():
 
 def description():
 	return "Change raster transparency interactively"
+
+def category():
+	return "Raster"
 
 def version():
 	return mVersion
