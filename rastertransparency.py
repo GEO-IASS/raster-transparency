@@ -111,7 +111,7 @@ class RasterTransparencyPlugin( object ):
       self.iface.addToolBarIcon( self.actionDock )
       self.iface.addPluginToMenu( QCoreApplication.translate( "RasterTransparency", "Raster transparency" ), self.actionDock )
       self.iface.addPluginToMenu( QCoreApplication.translate( "RasterTransparency", "Raster transparency" ), self.actionAbout )
-      
+
     # create dockwidget
     self.dockWidget = RasterTransparencyDockWidget( self )
     self.iface.addDockWidget( Qt.LeftDockWidgetArea, self.dockWidget )
@@ -162,7 +162,7 @@ class RasterTransparencyPlugin( object ):
 
     # get maximum value from raster statistics
     stat = self.layer.bandStatistics( self.layer.grayBandName() )
-    maxValue = stat.maximumValue
+    maxValue = int( stat.maximumValue )
     self.dockWidget.updateSliders( maxValue )
 
     self.dockWidget.disableOrEnableControls( True )
