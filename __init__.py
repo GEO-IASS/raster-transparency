@@ -1,7 +1,5 @@
 # -*- coding: utf-8 -*-
 
-mVersion = "0.1.14"
-
 #******************************************************************************
 #
 # RasterTransparency
@@ -38,7 +36,7 @@ def category():
   return "Raster"
 
 def version():
-  return mVersion
+  return "0.1.15"
 
 def qgisMinimumVersion():
   return "1.5"
